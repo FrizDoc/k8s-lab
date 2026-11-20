@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-deployment
+  namespace: proton
+  labels:
+    app: proton
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proton
+  template:
+    metadata:
+      labels:
+        app: proton
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:19.0-alpine3.24
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: secret
+            - name: POSTGRES_DB
+              value: postgres
+          volumeMounts:
+            - name: pg-volume
+              mountPath: /var/lib/postgresql
+      volumes:
+        - name: pg-volume
+          persistentVolumeClaim:
+            claimName: proton-pvc
